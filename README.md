@@ -19,3 +19,5 @@ cd server
 npm install
 npm run dev
 ```
+
+SQL connection in .env file
