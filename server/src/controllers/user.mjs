@@ -19,60 +19,76 @@ pool.on("error", (err, client) => {
   console.log(client);
 });
 
-export async function getUser(req, res, next) {
+const getUsers = async () => {
   try {
-    console.log("GET /me");
-    const { rows: data } = await pool.query("SELECT * from users");
-    return res.status(200).json(data);
+    console.log("GET all users");
+    const { rows: users } = await pool.query("SELECT * FROM users");
+    return users;
   } catch (error) {
-    next(error);
+    throw new Error(error.message);
   }
-}
+};
 
-export async function createUser(req, res, next) {
+const getUser = async (parent, args) => {
   try {
-    console.log("POST /me");
-    const { username, email, role_id, oauth_id } = req.body;
-    const result = await pool.query(
-      "INSERT INTO users (username, email, role_id, oauth_id) VALUES ($1, $2, $3, $4)",
-      [username, email, role_id, oauth_id]
+    console.log("GET user");
+    const { oauth_id } = args;
+    const { rows: user } = await pool.query(
+      "SELECT * FROM users WHERE oauth_id = $1",
+      [oauth_id]
     );
-    const data = {
-      username,
-      email,
-      role_id,
-      oauth_id,
-    };
-    if (result.rowCount === 1) return res.status(201).json(data);
+    return user[0];
   } catch (error) {
-    next(error);
+    throw new Error(error.message);
   }
-}
+};
 
-export async function updateUser(req, res, next) {
+const updateUser = async (parent, args) => {
   try {
-    console.log("PUT /me");
-    const oauth_id = req.params.oauth_id;
-    const { username, email } = req.body;
-    const result = await pool.query(
-      "UPDATE users SET username=$1, email = $2 WHERE oauth_id = $3",
+    console.log("PUT update user");
+    const { oauth_id, username, email } = args;
+    await pool.query(
+      "UPDATE users SET username = $1, email = $2 WHERE oauth_id = $3",
       [username, email, oauth_id]
     );
-    return res.sendStatus(204);
+    return { oauth_id, username, email };
   } catch (error) {
-    next(error);
+    throw new Error(error.message);
   }
-}
+};
 
-export async function deleteUser(req, res, next) {
+const deleteUser = async (parent, args) => {
   try {
-    console.log("DELETE /me");
-    req.user = { oauth_id: "test_also" };
-    const oauth_id = req.user.oauth_id;
-    const result = await pool.query("DELETE FROM users WHERE oauth_id = $1", [oauth_id]);
-    if (result.rowCount === 1) return res.sendStatus(204);
-    else return res.sendStatus(404);
+    console.log("DELETE user");
+    const { oauth_id } = args;
+    const result = await pool.query("DELETE FROM users WHERE oauth_id = $1", [
+      oauth_id,
+    ]);
+    if (result.rowCount === 1) return { message: "User deleted successfully" };
+    else return { message: "User not found" };
   } catch (error) {
-    next(error);
+    throw new Error(error.message);
   }
-}
+};
+
+const createUser = async (parent, args) => {
+  try {
+    console.log("POST add user");
+    const { username, email, oauth_id, role_id } = args;
+    const { rows: user } = await pool.query(
+      "INSERT INTO users (username, email, oauth_id, role_id) VALUES ($1, $2, $3, $4) RETURNING *",
+      [username, email, oauth_id, role_id]
+    );
+    return user[0];
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+export {
+  getUsers,
+  getUser,
+  createUser,
+  updateUser,
+  deleteUser,
+};
