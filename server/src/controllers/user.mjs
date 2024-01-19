@@ -22,7 +22,9 @@ pool.on("error", (err, client) => {
 const getUsers = async () => {
   try {
     console.log("GET all users");
-    const { rows: users } = await pool.query("SELECT * FROM users");
+    const result = await pool.query("SELECT * FROM users");
+    const { rows: users } = result;
+    console.log(users)
     return users;
   } catch (error) {
     throw new Error(error.message);

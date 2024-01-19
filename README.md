@@ -19,5 +19,19 @@ cd server
 npm install
 npm run dev
 ```
+*SQL connection in .env file
 
-SQL connection in .env file
+## GraphQL 
+
+# Playground
+You can find the GraphQL playground at http://localhost:{PORT}/playground
+There you can test the queries and mutations and see the documentation.
+
+
+# Soon features
+- add session front
+- add middleware auth back
+- integrate back api in front (Graphql)
+- render results
+- crud user data
+- improve style

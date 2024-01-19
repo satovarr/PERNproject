@@ -8,6 +8,7 @@ import {
 } from "graphql";
 
 import {
+  getUser,
   getUsers,
   createUser,
   updateUser,
@@ -44,7 +45,7 @@ const RootQuery = new GraphQLObjectType({
       type: UserType,
       args: { oauth_id: { type: GraphQLString } },
       resolve(parent, args) {
-        return getUsers(parent, args);
+        return getUser(parent, args);
       }
     },
     users: {
