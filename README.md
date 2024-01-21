@@ -29,7 +29,6 @@ There you can test the queries and mutations and see the documentation.
 
 
 # Soon features
-- add session front
 - add middleware auth back
 - integrate back api in front (Graphql)
 - render results
